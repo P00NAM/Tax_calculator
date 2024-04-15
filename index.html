@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<link rel="stylesheet" href="./styles.css">
+<title>Tax Calculator</title>
+</head>
+<body>
+
+<form class="container" id="taxForm">
+  <div class="mb-3">
+    <label for="grossIncome" class="form-label">Enter gross annual income <img src="./photos/circle_ques.png" width="15px" height="15px" alt="ques"> </label> <br>
+    <input type="number" class="form-control" id="grossIncome" placeholder="Enter gross annual income" name="grossIncome" required>
+    <span class="error-icon" id="grossIncomeError">!</span>
+   </div> 
+   <div class="mb-3">
+    <label for="extraIncome" class="form-label">Enter extra income <img src="./photos/circle_ques.png" width="15px" height="15px" alt="ques"></label> <br>
+    <input type="number" class="form-control" id="extraIncome" name="extraIncome" placeholder="Enter extra income " >
+    <span class="error-icon" id="extraIncomeError">!</span>
+    
+    </div>
+    <div class="mb-3"> 
+    <label for="age" class="form-label" >Enter age group <img src="./photos/circle_ques.png" width="15px" height="15px" alt="ques"></label> <br>
+    <select id="age" class="form-control" name="age">
+        <option value=""></option>
+        <option value="<40">&lt;40</option>
+        <option value=">=40 & <60">&ge;40 &lt;60</option>
+        <option value=">=60">&ge;60</option>
+    </select>
+    </div>
+    
+    <div class="mb-3">
+    <label for="deductions" class="form-label">Enter total applicable deductions <img src="./photos/circle_ques.png" width="15px" height="15px" alt="ques"></label> <br>
+    <input type="number" class="form-control" id="deductions" placeholder="Enter total applicable deductions" name="deductions">
+    <span class="error-icon" id="deductionsError">!</span>
+    </div>
+    <br>
+    <button class="btn btn-primary form-control"  type="submit" value="Calculate Tax">Submit</button>
+</form>
+
+<!-- Modal HTML -->
+<div id="myModal" class="modal">
+    <div class="modal-content">
+       <h2>Your overall income will be</h2> 
+        <h2 id="result"> </h2> 
+        <p>after tax deductions</p> <br> <br>
+        <button class="close-btn">close</button>
+    </div>
+</div>
+
+<script>
+    const form = document.getElementById('taxForm');
+    const ageField = document.getElementById('age');
+    const grossIncomeField = document.getElementById('grossIncome');
+    const extraIncomeField = document.getElementById('extraIncome');
+    const deductionsField = document.getElementById('deductions');
+    const grossIncomeErrorIcon = document.getElementById('grossIncomeError');
+    const extraIncomeErrorIcon = document.getElementById('extraIncomeError');
+    const deductionsErrorIcon = document.getElementById('deductionsError');
+    const modal = document.getElementById('myModal');
+    const closeModal = document.querySelector('.close-btn');
+
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+        validateInputs();
+    });
+
+    closeModal.addEventListener('click', function() {
+        modal.style.display = 'none';
+    });
+
+    function validateInputs() {
+        let valid = true;
+
+        if (!ageField.value) {
+            showError(ageField, 'Age is required.');
+            valid = false;
+        } else {
+            hideError(ageField);
+        }
+
+        if (!grossIncomeField.checkValidity()) {
+            showError(grossIncomeField, 'Invalid input.');
+            valid = false;
+        } else {
+            hideError(grossIncomeField);
+        }
+
+        if (!extraIncomeField.checkValidity()) {
+            showError(extraIncomeField, 'Invalid input.');
+            valid = false;
+        } else {
+            hideError(extraIncomeField);
+        }
+
+        if (!deductionsField.checkValidity()) {
+            showError(deductionsField, 'Invalid input.');
+            valid = false;
+        } else {
+            hideError(deductionsField);
+        }
+
+        if (valid) {
+            calculateTax();
+        }
+    }
+
+    function showError(inputField, errorMessage) {
+        const errorIcon = inputField.nextElementSibling;
+        errorIcon.style.display = 'inline';
+        errorIcon.title = errorMessage;
+    }
+
+    function hideError(inputField) {
+        const errorIcon = inputField.nextElementSibling;
+       // errorIcon.style.display = 'none';
+    }
+
+    function calculateTax() {
+        const age = ageField.value;
+        const grossIncome = parseFloat(grossIncomeField.value);
+        const extraIncome = parseFloat(extraIncomeField.value) || 0;
+        const deductions = parseFloat(deductionsField.value) || 0;
+
+        let tax = 0;
+        if (grossIncome + extraIncome - deductions > 8) {
+            if (age === '<40') {
+                tax = 0.3 * (grossIncome + extraIncome - deductions);
+            } else if (age === '>=40 & <60') {
+                tax = 0.4 * (grossIncome + extraIncome - deductions);
+            } else if (age === '>=60') {
+                tax = 0.1 * (grossIncome + extraIncome - deductions);
+            }
+        }
+
+        const result = ` ${grossIncome + extraIncome - deductions-tax.toFixed(2)} Lakhs`;
+        document.getElementById('result').textContent = result;
+        modal.style.display = 'block';
+    }
+</script>
+</body>
+</html>
